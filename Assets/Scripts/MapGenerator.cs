@@ -14,7 +14,7 @@ public class MapGenerator : MonoBehaviour
     private List<Vector2> allTileCoords;
     public List<Vector2> _occupiedCoords = new List<Vector2>();
     private Queue<Vector2> shuffledTileCoords;
-    public int seed = 10;
+    public int seed;
 
     private Transform mapHolder;
     private Transform food;
@@ -22,13 +22,16 @@ public class MapGenerator : MonoBehaviour
 
     private void Start()
     {
+        mapSize = new Vector2(PlayerPrefs.GetInt("Mapsize"), PlayerPrefs.GetInt("Mapsize"));;
+        seed = new System.Random().Next();
+        
         GenerateMap();
         SpawnNewFood();
     }
 
     public void GenerateMap()
     {
-        mapSize = new Vector2(PlayerPrefs.GetInt("Mapsize"), PlayerPrefs.GetInt("Mapsize"));
+        
         allTileCoords = new List<Vector2>();
         for (int x = 0; x < mapSize.x; x++)
         {
@@ -75,7 +78,6 @@ public class MapGenerator : MonoBehaviour
     {
         Vector2 randomCoord = shuffledTileCoords.Dequeue();
         shuffledTileCoords.Enqueue(randomCoord);
-        //Debug.Log(randomCoord);
         return randomCoord;
     }
 
