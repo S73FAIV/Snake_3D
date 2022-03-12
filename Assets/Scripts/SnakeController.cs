@@ -20,6 +20,7 @@ public class SnakeController : MonoBehaviour
     private bool _newTailAdded;
 
     public event Action OnDeath;
+    public event Action OnEat;
 
     void Start()
     {
@@ -94,6 +95,11 @@ public class SnakeController : MonoBehaviour
     {
         if (_coord == _map.GetFoodCoord())
         {
+            if (OnEat != null)
+            {
+                OnEat();
+            }
+            
             _map.SpawnNewFood();
             AddToTail();
             _newTailAdded = true;
