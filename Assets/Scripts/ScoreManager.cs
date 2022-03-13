@@ -6,17 +6,21 @@ using UnityEngine.UI;
 
 public class ScoreManager : MonoBehaviour
 {
-    private int score;
+    public int score;
+    public string playerNick;
     private bool gameOver = false;
+    
+    public event Action ScoreFinished;
+    
     public Text scoreText;
     public Text gameOverScore;
 
-    private float msBetweenScoreIncrement = 300;
+    private float _msBetweenScoreIncrement = 300;
     private float _nextScoreIncTime;
 
     private int scoreIncrementTime = 10;
     private int scoreIncrementEat = 1000;
-
+    
     void Start()
     {
         FindObjectOfType<SnakeController>().OnEat += OnEat;
@@ -33,7 +37,7 @@ public class ScoreManager : MonoBehaviour
     {
         if (Time.time > _nextScoreIncTime && !gameOver)
         {
-            _nextScoreIncTime = Time.time + msBetweenScoreIncrement / 1000;
+            _nextScoreIncTime = Time.time + _msBetweenScoreIncrement / 1000;
             score += scoreIncrementTime;
         }
     }
@@ -43,14 +47,14 @@ public class ScoreManager : MonoBehaviour
         float speed = PlayerPrefs.GetFloat("speedMultiplier");
         if (speed == 0)
         {
-            msBetweenScoreIncrement = 300;
+            _msBetweenScoreIncrement = 300;
         }
         else
         {
-            msBetweenScoreIncrement = 300 / speed;
+            _msBetweenScoreIncrement = 300 / speed;
         }
     }
-
+    
     private void OnEat()
     {
         score += scoreIncrementEat;
@@ -62,4 +66,15 @@ public class ScoreManager : MonoBehaviour
         scoreText.enabled = false;
         gameOverScore.text = string.Format("Score: {0:00000}", score);
     }
+
+    public void SetPlayerNick(string _playerNick)
+    {
+        playerNick = _playerNick;
+        
+        if (ScoreFinished != null)
+        {
+            ScoreFinished();
+        }
+    }
+    
 }

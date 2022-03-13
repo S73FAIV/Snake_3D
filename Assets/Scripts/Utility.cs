@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -8,7 +9,7 @@ public class Utility
 {
     public static T[] ShuffleArray<T>(T[] array, int seed)
     {
-        System.Random prng = new Random(seed);
+        Random prng = new Random(seed);
 
         for (int i = 0; i < array.Length - 1; i++)
         {
@@ -20,4 +21,47 @@ public class Utility
     }
 
     public static int Mod(int a, int n) => (a % n + n) % n;
+
+    public static Dictionary<int, string> GetSavedHighScoresDictionary()
+    {
+        Dictionary<int, string> currentHighScores = new Dictionary<int, string>();
+        int i = 0;
+        while (PlayerPrefs.GetInt(String.Format("HighScore#{0}", i)) != 0)
+        {
+            i++;
+            int score = PlayerPrefs.GetInt(String.Format("HighScore#{0}", i));
+            string player = PlayerPrefs.GetString(String.Format("PlayerScore#{0}", i));
+            currentHighScores.Add(score, player);
+        }
+
+        return currentHighScores;
+    }
+    
+    public static List<string> GetSavedHighScorePlayers()
+    {
+        List<string> highScorePlayers = new List<string>();
+        int i = 0;
+        while (PlayerPrefs.GetInt(String.Format("HighScore#{0}", i)) != 0)
+        {
+            i++;
+            string player = PlayerPrefs.GetString(String.Format("PlayerScore#{0}", i));
+            highScorePlayers.Add(player);
+        }
+
+        return highScorePlayers;
+    }
+    
+    public static List<int> GetSavedHighScores()
+    {
+        List<int> currentHighScores = new List<int>();
+        int i = 0;
+        while (PlayerPrefs.GetInt(String.Format("HighScore#{0}", i)) != 0)
+        {
+            i++;
+            int score = PlayerPrefs.GetInt(String.Format("HighScore#{0}", i));
+            currentHighScores.Add(score);
+        }
+
+        return currentHighScores;
+    }
 }
