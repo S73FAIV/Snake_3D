@@ -7,7 +7,9 @@ using UnityEngine.UI;
 public class ScoreManager : MonoBehaviour
 {
     private int score;
+    private bool gameOver = false;
     public Text scoreText;
+    public Text gameOverScore;
 
     private float msBetweenScoreIncrement = 300;
     private float _nextScoreIncTime;
@@ -18,6 +20,7 @@ public class ScoreManager : MonoBehaviour
     void Start()
     {
         FindObjectOfType<SnakeController>().OnEat += OnEat;
+        FindObjectOfType<SnakeController>().OnDeath += OnDeath;
         InitScoreIncrements();
     }
 
@@ -28,7 +31,7 @@ public class ScoreManager : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (Time.time > _nextScoreIncTime)
+        if (Time.time > _nextScoreIncTime && !gameOver)
         {
             _nextScoreIncTime = Time.time + msBetweenScoreIncrement / 1000;
             score += scoreIncrementTime;
@@ -42,7 +45,6 @@ public class ScoreManager : MonoBehaviour
         {
             msBetweenScoreIncrement = 300;
         }
-
         else
         {
             msBetweenScoreIncrement = 300 / speed;
@@ -52,6 +54,12 @@ public class ScoreManager : MonoBehaviour
     private void OnEat()
     {
         score += scoreIncrementEat;
-        Debug.Log("New EatScore: " + score);
+    }
+
+    private void OnDeath()
+    {
+        gameOver = true;
+        scoreText.enabled = false;
+        gameOverScore.text = string.Format("Score: {0:00000}", score);
     }
 }

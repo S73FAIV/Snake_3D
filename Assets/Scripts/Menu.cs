@@ -10,6 +10,7 @@ public class Menu : MonoBehaviour
 {
     public GameObject mainMenuHolder;
     public GameObject optionsMenuHolder;
+    public GameObject highScoreMenuHolder;
 
     public int[] mapSizes;
 
@@ -39,13 +40,22 @@ public class Menu : MonoBehaviour
     public void OptionsMenu()
     {
         mainMenuHolder.SetActive(false);
+        highScoreMenuHolder.SetActive(false);
         optionsMenuHolder.SetActive(true);
+    }
+    
+    public void HighScoreMenu()
+    {
+        mainMenuHolder.SetActive(false);
+        optionsMenuHolder.SetActive(false);
+        highScoreMenuHolder.SetActive(true);
     }
 
     public void MainMenu()
     {
         mainMenuHolder.SetActive(true);
         optionsMenuHolder.SetActive(false);
+        highScoreMenuHolder.SetActive(false);
     }
 
     public void SetMapSize(int i)
