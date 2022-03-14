@@ -2,10 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = System.Random;
 
 public class SnakeController : MonoBehaviour
 {
-    [SerializeField] private Vector3 _velocity = Vector3.forward;
+    [SerializeField] private Vector3 _velocity;
     [SerializeField] private Vector2 _coord;
 
     private MapGenerator _map;
@@ -17,15 +18,20 @@ public class SnakeController : MonoBehaviour
     private Queue<Transform> _tails;
     private Queue<Vector2> _tailCoords;
     private bool _newTailAdded;
-    
+
     public event Action OnDeath;
-    
+    public event Action OnEat;
+
     void Start()
     {
         _map = FindObjectOfType<MapGenerator>();
-        transform.position = _map.CoordToPosition(0, 0) + Vector3.up * .5f;
+        Random prng = new Random();
+        _coord = new Vector2(prng.Next(0, (int) _map.mapSize.x - 1), prng.Next(0, (int) _map.mapSize.y - 1));
+        transform.position = _map.CoordToPosition((int) _coord.x, (int) _coord.y) + Vector3.up * .5f;
+        _velocity = Vector3.forward;
         _tails = new Queue<Transform>();
         _tailCoords = new Queue<Vector2>();
+        InitSpeed();
     }
 
     public void FixedUpdate()
@@ -42,32 +48,46 @@ public class SnakeController : MonoBehaviour
     {
         _velocity = direction.normalized;
     }
-    
+
     private void Move()
     {
         if (Time.time > _nextMoveTime)
         {
             _nextMoveTime = Time.time + msBetweenSteps / 1000;
-            
+
             //Dont move Tail, if new TailPart is Added
             if (!_newTailAdded)
             {
                 MoveTail(transform.position, _coord);
             }
+
             _newTailAdded = false;
-            
+
             _coord = UpdateCoord(_velocity);
             //death on hit yourself
             if (_map._occupiedCoords.Contains(_coord))
             {
                 Die();
             }
-            
+
             //Move SnakeHead
             transform.position = _map.CoordToPosition((int) _coord.x, (int) _coord.y) + Vector3.up * 0.5f;
 
             //_velocity = Vector3.zero; //-->Comment for Snake Movement!
-           SetMapOccupiedCoords();
+            SetMapOccupiedCoords();
+        }
+    }
+
+    private void InitSpeed()
+    {
+        float speed = PlayerPrefs.GetFloat("speedMultiplier");
+        if (speed == 0)
+        {
+            msBetweenSteps = 300;
+        }
+        else
+        {
+            msBetweenSteps = 300 / speed;
         }
     }
 
@@ -75,6 +95,11 @@ public class SnakeController : MonoBehaviour
     {
         if (_coord == _map.GetFoodCoord())
         {
+            if (OnEat != null)
+            {
+                OnEat();
+            }
+            
             _map.SpawnNewFood();
             AddToTail();
             _newTailAdded = true;
@@ -121,7 +146,7 @@ public class SnakeController : MonoBehaviour
         occupiedCoords.Add(_coord);
         _map._occupiedCoords = occupiedCoords;
     }
-    
+
     [ContextMenu("Self Destruct")]
     void Die()
     {
@@ -129,7 +154,7 @@ public class SnakeController : MonoBehaviour
         {
             OnDeath();
         }
+
         Destroy(gameObject);
     }
-    
 }
