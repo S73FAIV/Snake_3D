@@ -1,7 +1,5 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 using Random = System.Random;
 
@@ -22,46 +20,31 @@ public class Utility
 
     public static int Mod(int a, int n) => (a % n + n) % n;
 
-    public static Dictionary<int, string> GetSavedHighScoresDictionary()
-    {
-        Dictionary<int, string> currentHighScores = new Dictionary<int, string>();
-        int i = 0;
-        while (PlayerPrefs.GetInt(String.Format("HighScore#{0}", i)) != 0)
-        {
-            i++;
-            int score = PlayerPrefs.GetInt(String.Format("HighScore#{0}", i));
-            string player = PlayerPrefs.GetString(String.Format("PlayerScore#{0}", i));
-            currentHighScores.Add(score, player);
-        }
 
-        return currentHighScores;
+
+    public static void SaveHighScores(HighScore save)
+    {
+        BinaryFormatter bf = new BinaryFormatter();
+        FileStream file = File.Create(Application.persistentDataPath + "/MySaveData.dat");
+        bf.Serialize(file, save);
+        file.Close();
     }
     
-    public static List<string> GetSavedHighScorePlayers()
-    {
-        List<string> highScorePlayers = new List<string>();
-        int i = 0;
-        while (PlayerPrefs.GetInt(String.Format("HighScore#{0}", i)) != 0)
-        {
-            i++;
-            string player = PlayerPrefs.GetString(String.Format("PlayerScore#{0}", i));
-            highScorePlayers.Add(player);
-        }
 
-        return highScorePlayers;
-    }
-    
-    public static List<int> GetSavedHighScores()
+    public static HighScore LoadHighScore()
     {
-        List<int> currentHighScores = new List<int>();
-        int i = 0;
-        while (PlayerPrefs.GetInt(String.Format("HighScore#{0}", i)) != 0)
+        HighScore data;
+        if (File.Exists(Application.persistentDataPath + "/MySaveData.dat"))
         {
-            i++;
-            int score = PlayerPrefs.GetInt(String.Format("HighScore#{0}", i));
-            currentHighScores.Add(score);
+            BinaryFormatter bf = new BinaryFormatter();
+            FileStream file = File.Open(Application.persistentDataPath + "/MySaveData.dat", FileMode.Open);
+            data = (HighScore) bf.Deserialize(file);
+            file.Close();
         }
-
-        return currentHighScores;
+        else
+        {
+            data = new HighScore();
+        }
+        return data;
     }
 }

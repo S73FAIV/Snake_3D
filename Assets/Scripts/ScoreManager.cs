@@ -7,11 +7,9 @@ using UnityEngine.UI;
 public class ScoreManager : MonoBehaviour
 {
     public int score;
-    public string playerNick;
+    public string playerNick = "---";
     private bool gameOver = false;
-    
-    public event Action ScoreFinished;
-    
+
     public Text scoreText;
     public Text gameOverScore;
 
@@ -20,7 +18,7 @@ public class ScoreManager : MonoBehaviour
 
     private int scoreIncrementTime = 10;
     private int scoreIncrementEat = 1000;
-    
+
     void Start()
     {
         FindObjectOfType<SnakeController>().OnEat += OnEat;
@@ -38,7 +36,7 @@ public class ScoreManager : MonoBehaviour
         if (Time.time > _nextScoreIncTime && !gameOver)
         {
             _nextScoreIncTime = Time.time + _msBetweenScoreIncrement / 1000;
-            score += scoreIncrementTime;
+            score += scoreIncrementTime / Mathf.RoundToInt(Mathf.Log(score));
         }
     }
 
@@ -54,7 +52,7 @@ public class ScoreManager : MonoBehaviour
             _msBetweenScoreIncrement = 300 / speed;
         }
     }
-    
+
     private void OnEat()
     {
         score += scoreIncrementEat;
@@ -64,17 +62,11 @@ public class ScoreManager : MonoBehaviour
     {
         gameOver = true;
         scoreText.enabled = false;
-        gameOverScore.text = string.Format("Score: {0:00000}", score);
+        gameOverScore.text = string.Format("You: {0:00000}", score);
     }
 
     public void SetPlayerNick(string _playerNick)
     {
         playerNick = _playerNick;
-        
-        if (ScoreFinished != null)
-        {
-            ScoreFinished();
-        }
     }
-    
 }
